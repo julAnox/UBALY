@@ -34,8 +34,14 @@ function loadCart(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = sessionStorage.getItem(CART_STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as CartItem[];
-  } catch {}
+    if (raw) {
+      const parsed = JSON.parse(raw) as CartItem[];
+      console.log("[v0] Loaded cart from sessionStorage:", parsed);
+      return parsed;
+    }
+  } catch (e) {
+    console.log("[v0] Error loading cart:", e);
+  }
   return [];
 }
 
@@ -65,6 +71,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items, hydrated]);
 
   const addItem = useCallback((product: Product, size: string) => {
+    console.log(
+      "[v0] Adding to cart:",
+      product.title,
+      "Images:",
+      product.images,
+    );
     setItems((prev) => {
       const existing = prev.find(
         (item) => item.product.id === product.id && item.size === size,

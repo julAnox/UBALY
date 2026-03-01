@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 export function Lookbook() {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 })
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   return (
     <section id="lookbook" className="px-6 lg:px-12 py-20 lg:py-32" ref={ref}>
@@ -11,7 +11,9 @@ export function Lookbook() {
         {/* Left - Text */}
         <div
           className={`flex flex-col justify-center lg:pr-12 transition-all duration-800 ${
-            isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+            isVisible
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-10"
           }`}
           style={{ transitionDuration: "800ms" }}
         >
@@ -22,24 +24,23 @@ export function Lookbook() {
             {"Не следуй трендам — создавай их"}
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed mb-4 max-w-lg">
-            {"UBALY — это белорусский стритвир бренд, созданный для тех, кто живет по своим правилам. Мы верим, что одежда — это не просто ткань, а способ заявить о себе миру."}
+            {
+              "UBALY — это белорусский стритвир бренд, созданный для тех, кто живет по своим правилам. Мы верим, что одежда — это не просто ткань, а способ заявить о себе миру."
+            }
           </p>
           <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-lg">
-            {"Каждая коллекция — лимитированная серия. Мы используем плотный хлопок, техничные ткани и качественную фурнитуру. Все изделия отшиваются малыми партиями в Беларуси с вниманием к каждой детали."}
+            {
+              "Каждая коллекция — лимитированная серия. Мы используем плотный хлопок, техничные ткани и качественную фурнитуру. Все изделия отшиваются малыми партиями в Беларуси с вниманием к каждой детали."
+            }
           </p>
 
           {/* Stats */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 mb-8">
-            <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">500+</p>
-              <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mt-1">
-                {"Уникальных дизайнов"}
-              </p>
-            </div>
-            <div className="hidden sm:block w-px h-12 bg-border" />
             <div className="h-px sm:hidden bg-border" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">3K+</p>
+              <p className="text-2xl lg:text-3xl font-bold text-foreground">
+                500+
+              </p>
               <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mt-1">
                 {"Довольных клиентов"}
               </p>
@@ -47,7 +48,9 @@ export function Lookbook() {
             <div className="hidden sm:block w-px h-12 bg-border" />
             <div className="h-px sm:hidden bg-border" />
             <div>
-              <p className="text-2xl lg:text-3xl font-bold text-foreground">100%</p>
+              <p className="text-2xl lg:text-3xl font-bold text-foreground">
+                100%
+              </p>
               <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mt-1">
                 {"Качество"}
               </p>
@@ -66,7 +69,9 @@ export function Lookbook() {
         {/* Right - Image */}
         <div
           className={`relative aspect-[3/4] lg:aspect-auto overflow-hidden transition-all duration-800 ${
-            isVisible ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-10 scale-[0.97]"
+            isVisible
+              ? "opacity-100 translate-x-0 scale-100"
+              : "opacity-0 translate-x-10 scale-[0.97]"
           }`}
           style={{ transitionDuration: "900ms", transitionDelay: "200ms" }}
         >
@@ -78,5 +83,5 @@ export function Lookbook() {
         </div>
       </div>
     </section>
-  )
+  );
 }

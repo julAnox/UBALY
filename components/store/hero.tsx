@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ArrowDown } from "lucide-react"
+import { useState, useEffect } from "react";
+import { ArrowDown } from "lucide-react";
 
 export function Hero() {
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 50)
-    return () => clearTimeout(t)
-  }, [])
+    const t = setTimeout(() => setLoaded(true), 50);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
@@ -41,9 +41,9 @@ export function Hero() {
           }`}
           style={{ transitionDelay: "500ms", transitionDuration: "800ms" }}
         >
-          {"Определяй"}
+          {"Hi"}
           <br />
-          {"свой стиль"}
+          {"We are UBALY"}
         </h2>
         <p
           className={`text-sm md:text-base text-background/70 max-w-md leading-relaxed mb-10 transition-all duration-600 ${
@@ -51,7 +51,9 @@ export function Hero() {
           }`}
           style={{ transitionDelay: "700ms", transitionDuration: "600ms" }}
         >
-          {"Премиальный стритвир для тех, кто создает стиль, а не следует ему"}
+          {
+            "Мы - белорусский бренд одежды, созданный на основе любви к нашей стране и людям"
+          }
         </p>
         <a
           href="#catalog"
@@ -60,7 +62,7 @@ export function Hero() {
           }`}
           style={{ transitionDelay: "900ms", transitionDuration: "600ms" }}
         >
-          {"Смотреть каталог"}
+          {"Каталог"}
         </a>
       </div>
 
@@ -71,9 +73,11 @@ export function Hero() {
         }`}
         style={{ transitionDelay: "1100ms" }}
       >
-        <span className="text-[10px] uppercase tracking-[0.2em] text-background/70">Scroll</span>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-background/70">
+          Scroll
+        </span>
         <ArrowDown className="h-4 w-4 text-background/70 animate-bounce" />
       </div>
     </section>
-  )
+  );
 }

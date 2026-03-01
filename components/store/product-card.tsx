@@ -4,11 +4,7 @@ import { useState } from "react";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Product } from "@/hooks/use-products";
 import { useCart } from "@/lib/cart-context";
-
-interface ProductCardProps {
-  product: Product;
-  index?: number;
-}
+import { getAllImages, getFirstImage } from "@/lib/image-utils";
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat("ru-RU", {
@@ -17,6 +13,11 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
+interface ProductCardProps {
+  product: Product;
+  index?: number;
+}
+
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -24,15 +25,17 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  console.log(
-    "[v0] ProductCard - Product:",
-    product.title,
-    "Sizes:",
-    product.sizes,
-  );
-
-  const images = [product.image1, product.image2, product.image3];
+  const images = getAllImages(product.images);
   const hasMultipleImages = images.length > 1;
+
+  console.log(
+    "[v0] Product:",
+    product.title,
+    "Images array:",
+    images,
+    "Images field:",
+    product.images,
+  );
 
   const handleAddToCart = () => {
     if (!product.sizes || product.sizes.length === 0) {
@@ -64,49 +67,47 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
   return (
     <div className="group relative flex flex-col">
-      {/* Image container */}
-      <div className="relative aspect-square overflow-hidden bg-secondary mb-2">
-        {/* Main image (always loaded) */}
+      <div className="relative aspect-square overflow-hidden bg-gray-100 mb-2 rounded">
         <img
-          src={images[0]}
+          src={getFirstImage(product.images || product.image1)}
           alt={product.title}
           className={`w-full h-full object-cover transition-all duration-500 ${
             currentImageIndex === 0 ? "opacity-100" : "opacity-0"
           } ${imageLoaded ? "scale-100" : "scale-105"} group-hover:scale-105`}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           onLoad={() => setImageLoaded(true)}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            img.src = "https://via.placeholder.com/400x500?text=Product";
+          }}
         />
 
-        {/* Additional images (lazy loaded, only render when navigated) */}
-        {hasMultipleImages && currentImageIndex > 0 && (
-          <img
-            src={images[currentImageIndex]}
-            alt={`${product.title} - photo ${currentImageIndex + 1}`}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        )}
+        {hasMultipleImages &&
+          currentImageIndex > 0 &&
+          images[currentImageIndex] && (
+            <img
+              src={images[currentImageIndex]}
+              alt={`${product.title} - ${currentImageIndex + 1}`}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          )}
 
-        {/* Image navigation arrows */}
         {hasMultipleImages && (
           <>
             <button
               onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background/90"
-              aria-label="Previous photo"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white/90 rounded"
             >
-              <ChevronLeft className="h-3.5 w-3.5 text-foreground" />
+              <ChevronLeft className="h-3.5 w-3.5 text-gray-900" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background/90"
-              aria-label="Next photo"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white/90 rounded"
             >
-              <ChevronRight className="h-3.5 w-3.5 text-foreground" />
+              <ChevronRight className="h-3.5 w-3.5 text-gray-900" />
             </button>
           </>
         )}
 
-        {/* Image dots indicator */}
         {hasMultipleImages && (
           <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             {images.map((_, idx) => (
@@ -118,22 +119,15 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 }}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   idx === currentImageIndex
-                    ? "bg-foreground w-4"
-                    : "bg-foreground/40 hover:bg-foreground/60 w-1.5"
+                    ? "bg-gray-900 w-4"
+                    : "bg-gray-400 hover:bg-gray-600 w-1.5"
                 }`}
-                aria-label={`Photo ${idx + 1}`}
               />
             ))}
           </div>
         )}
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          {/* Badges are not available in new API, but can be added later */}
-        </div>
-
-        {/* Quick add overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-background/90 backdrop-blur-sm z-20">
+        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-white/90 backdrop-blur-sm z-20 rounded-t">
           {showSizes && product.sizes && product.sizes.length > 0 ? (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -141,10 +135,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border transition-all duration-200 ${
+                    className={`px-3 py-1.5 text-xs uppercase tracking-wider border rounded transition-all duration-200 ${
                       selectedSize === size
-                        ? "border-foreground bg-foreground text-background"
-                        : "border-border text-foreground hover:border-foreground"
+                        ? "border-gray-900 bg-gray-900 text-white"
+                        : "border-gray-300 text-gray-900 hover:border-gray-900"
                     }`}
                   >
                     {size}
@@ -154,15 +148,15 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               <button
                 onClick={handleAddToCart}
                 disabled={!selectedSize}
-                className="w-full py-2 bg-foreground text-background text-[11px] uppercase tracking-[0.15em] hover:bg-foreground/90 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full py-2 bg-gray-900 text-white text-xs uppercase tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed rounded"
               >
-                {"В корзину"}
+                В корзину
               </button>
             </div>
           ) : (
             <button
               onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 py-2 text-[11px] uppercase tracking-[0.15em] text-foreground hover:text-muted-foreground transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2 text-xs uppercase tracking-wider text-gray-900 hover:text-gray-600 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
               {product.sizes && product.sizes.length > 0
@@ -173,19 +167,16 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Product info */}
       <div className="flex flex-col gap-0.5">
-        <span className="text-[8px] uppercase tracking-[0.1em] text-muted-foreground">
+        <span className="text-xs uppercase tracking-wider text-gray-600">
           {product.category}
         </span>
-        <h3 className="text-xs font-medium text-foreground leading-tight line-clamp-2">
+        <h3 className="text-sm font-medium text-gray-900 leading-tight line-clamp-2">
           {product.title}
         </h3>
-        <div className="flex items-center gap-1">
-          <span className="text-xs font-medium text-foreground">
-            {formatPrice(product.price)}
-          </span>
-        </div>
+        <span className="text-sm font-medium text-gray-900">
+          {formatPrice(product.price)}
+        </span>
       </div>
     </div>
   );

@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import logo from "../../public/logo.png";
+import { getFirstImage } from "@/lib/image-utils";
 import {
   ArrowLeft,
   ShoppingBag,
@@ -92,8 +94,7 @@ function SendingOverlay() {
   );
 }
 
-const paymentMethods = [
-  { id: "card", label: "Перевод на карту", icon: CreditCard },
+const allPaymentMethods = [
   { id: "cash", label: "Наличные", icon: Banknote },
   { id: "online", label: "Онлайн-оплата", icon: Smartphone },
 ] as const;
@@ -297,6 +298,13 @@ function CheckoutForm() {
         updated.deliveryMethod = "" as "";
         updated.deliveryAddress = "";
         updated.europochtaBranch = "";
+        if (value === "minsk") {
+          if (updated.payment !== "cash" && updated.payment !== "online") {
+            updated.payment = "online";
+          }
+        } else {
+          updated.payment = "online";
+        }
         if (value === "belarus") updated.deliveryMethod = "europochta";
         if (value === "russia") updated.deliveryMethod = "cdek";
       }
@@ -368,7 +376,7 @@ function CheckoutForm() {
         </Link>
         <Link href="/" className="absolute left-1/2 -translate-x-1/2">
           <Image
-            src="/images/logo.png"
+            src={logo}
             alt="UBALY"
             width={100}
             height={32}
@@ -676,8 +684,23 @@ function CheckoutForm() {
                 {"Способ оплаты"}
               </legend>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {paymentMethods.map((pm) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {allPaymentMethods.map((pm) => {
+                  // Определяем доступные способы оплаты в зависимости от региона
+                  let isAvailable = true;
+                  if (form.deliveryRegion === "minsk") {
+                    // По Минску: доступны наличные и онлайн
+                    isAvailable = true;
+                  } else if (
+                    form.deliveryRegion === "belarus" ||
+                    form.deliveryRegion === "russia"
+                  ) {
+                    // По России и Беларуси: только онлайн
+                    isAvailable = pm.id === "online";
+                  }
+
+                  if (!isAvailable) return null;
+
                   const Icon = pm.icon;
                   const active = form.payment === pm.id;
                   return (
@@ -764,15 +787,17 @@ function CheckoutForm() {
                       }`}
                     >
                       <div className="relative w-14 h-[72px] flex-shrink-0 bg-secondary overflow-hidden">
-                        <Image
-                          src={
-                            item.product.image1 ||
-                            "https://via.placeholder.com/400x500?text=Product"
-                          }
-                          alt={item.product.title || "Product"}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
+                        <img
+                          src={getFirstImage(
+                            item.product.images || item.product.image1,
+                          )}
+                          alt={item.product.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            img.src =
+                              "https://via.placeholder.com/80x100?text=Product";
+                          }}
                         />
                       </div>
                       <div className="flex-1 flex flex-col justify-between min-w-0">

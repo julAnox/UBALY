@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 export function Marquee() {
-  const text = "UBALY \u00B7 STREETWEAR \u00B7 PREMIUM QUALITY \u00B7 LIMITED EDITION \u00B7 MINSK \u00B7 "
+  const text =
+    "UBALY \u00B7 STREETWEAR \u00B7 UBALY \u00B7 STREETWEAR \u00B7 UBALY \u00B7 STREETWEAR \u00B7";
 
   return (
     <div className="overflow-hidden border-y border-border py-4 hover:border-foreground/20 transition-colors duration-500">
@@ -19,5 +20,5 @@ export function Marquee() {
         ))}
       </div>
     </div>
-  )
+  );
 }

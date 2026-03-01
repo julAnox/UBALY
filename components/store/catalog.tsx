@@ -3,22 +3,19 @@
 import { useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "./product-card";
-import { Pagination } from "./pagination";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const PRODUCTS_PER_PAGE = 6;
-const CATEGORIES = ["Все", "clothing", "accessories", "footwear"];
+const CATEGORIES = ["Все", "hoodie", "longsleeves", "shirts"];
 const CATEGORY_LABELS: Record<string, string> = {
   Все: "Все",
-  clothing: "Одежда",
-  accessories: "Аксессуары",
-  footwear: "Обувь",
+  hoodie: "Худи",
+  longsleeves: "Лонгсливы",
+  shirts: "Футболки",
 };
 
 export function Catalog() {
   const [activeCategory, setActiveCategory] = useState("Все");
   const [currentPage, setCurrentPage] = useState(1);
-  const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.02 });
   const { products, isLoading } = useProducts();
 
   const filteredProducts =
@@ -38,7 +35,6 @@ export function Catalog() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll to catalog section
     const catalogSection = document.getElementById("catalog");
     if (catalogSection) {
       const headerHeight = 80;
@@ -48,37 +44,24 @@ export function Catalog() {
   };
 
   return (
-    <section
-      id="catalog"
-      className="px-4 lg:px-6 py-12 lg:py-20"
-      ref={sectionRef}
-    >
+    <section id="catalog" className="px-4 lg:px-6 py-12 lg:py-20">
       <div className="max-w-4xl mx-auto">
-        {/* Section header */}
-        <div
-          className={`flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
-              {"Каталог"}
-            </p>
-            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
-              {"Новая коллекция"}
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
+              Каталог
             </h2>
           </div>
 
-          {/* Category filters */}
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-0 flex-wrap">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleCategoryChange(cat)}
-                className={`px-4 py-2 text-[11px] uppercase tracking-[0.15em] transition-all duration-300 ${
+                className={`px-4 py-2 text-xs uppercase tracking-wider transition-all duration-300 ${
                   activeCategory === cat
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {CATEGORY_LABELS[cat]}
@@ -87,44 +70,56 @@ export function Catalog() {
           </div>
         </div>
 
-        {/* Loading state */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin" />
           </div>
         )}
 
-        {/* Product grid */}
         {!isLoading && (
           <>
-            <div className="grid grid-cols-2 gap-3 lg:gap-60">
-              {currentProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className={`transition-all duration-600 ${
-                    isVisible
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-8"
-                  }`}
-                  style={{
-                    transitionDelay: isVisible
-                      ? `${Math.min(index * 80, 400)}ms`
-                      : "0ms",
-                    transitionDuration: "600ms",
-                  }}
-                >
-                  <ProductCard product={product} index={index} />
-                </div>
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6 mb-8">
+              {currentProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 text-xs uppercase tracking-wider border border-gray-300 text-gray-900 hover:border-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Назад
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`px-3 py-2 text-xs uppercase tracking-wider border transition-colors ${
+                        page === currentPage
+                          ? "border-gray-900 bg-gray-900 text-white"
+                          : "border-gray-300 text-gray-900 hover:border-gray-900"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
+
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 text-xs uppercase tracking-wider border border-gray-300 text-gray-900 hover:border-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Далее
+                </button>
+              </div>
             )}
           </>
         )}

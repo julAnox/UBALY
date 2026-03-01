@@ -5,9 +5,9 @@ import json
 
 class Product(models.Model):
     CATEGORY_CHOICES = [
-        ('clothing', 'Одежда'),
-        ('accessories', 'Аксессуары'),
-        ('footwear', 'Обувь'),
+        ('hoodie', 'Худи'),
+        ('longsleeves', 'Лонгсливы'),
+        ('shirts', 'Футболки'),
     ]
 
     CLOTHING_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
@@ -25,9 +25,7 @@ class Product(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name="Цена (BYN)"
     )
-    image1 = models.URLField(verbose_name="Фото 1")
-    image2 = models.URLField(verbose_name="Фото 2")
-    image3 = models.URLField(verbose_name="Фото 3")
+    images = models.JSONField(default=list, blank=True, verbose_name="Фотографии (URL)")
     description = models.TextField(blank=True, verbose_name="Описание")
     sizes = models.JSONField(default=list, blank=True, verbose_name="Размеры")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -47,9 +45,7 @@ class Product(models.Model):
             'title': self.title,
             'category': self.category,
             'price': float(self.price),
-            'image1': self.image1,
-            'image2': self.image2,
-            'image3': self.image3,
+            'images': self.images if isinstance(self.images, list) else [],
             'description': self.description,
             'sizes': self.sizes if isinstance(self.sizes, list) else [],
         }
@@ -62,7 +58,6 @@ class Order(models.Model):
     ]
 
     PAYMENT_METHOD_CHOICES = [
-        ('card', 'Перевод на карту'),
         ('cash', 'Наличные'),
         ('online', 'Онлайн-оплата'),
     ]
